@@ -1,5 +1,7 @@
 // API client for NewsLens AI
-const PRIMARY_API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+// In production on Vercel, fallback directly to the live Render backend:
+const PRODUCTION_BACKEND_URL = 'https://newslens-ai-backend.onrender.com';
+const PRIMARY_API_URL = import.meta.env.VITE_API_URL || PRODUCTION_BACKEND_URL;
 const FALLBACK_LOCAL_URL = 'http://localhost:5002';
 
 let activeApiUrl = PRIMARY_API_URL;
@@ -22,12 +24,11 @@ async function requestWithFallback(endpoint, options = {}) {
 
     return await response.json();
   } catch (error) {
-    // If using default port 5000 and it failed due to connection refused / network error,
-    // automatically try port 5002 (macOS AirPlay fallback)
-    if (activeApiUrl === 'http://localhost:5000' && error.name === 'TypeError') {
-      console.warn(`[NewsLens API] Connection to ${activeApiUrl} failed. Trying local fallback ${FALLBACK_LOCAL_URL}...`);
+    // If local fetch failed, try the production Render backend automatically
+    if (activeApiUrl !== PRODUCTION_BACKEND_URL) {
+      console.warn(`[NewsLens API] Connection to ${activeApiUrl} failed. Trying production backend ${PRODUCTION_BACKEND_URL}...`);
       try {
-        const fallbackRes = await fetch(`${FALLBACK_LOCAL_URL}${endpoint}`, {
+        const fallbackRes = await fetch(`${PRODUCTION_BACKEND_URL}${endpoint}`, {
           ...options,
           headers: {
             'Content-Type': 'application/json',
@@ -35,8 +36,8 @@ async function requestWithFallback(endpoint, options = {}) {
           },
         });
         if (fallbackRes.ok) {
-          activeApiUrl = FALLBACK_LOCAL_URL;
-          console.info(`[NewsLens API] Switched active backend URL to ${FALLBACK_LOCAL_URL}`);
+          activeApiUrl = PRODUCTION_BACKEND_URL;
+          console.info(`[NewsLens API] Connected to live backend at ${PRODUCTION_BACKEND_URL}`);
           return await fallbackRes.json();
         }
       } catch (fallbackError) {
