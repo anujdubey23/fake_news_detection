@@ -1,0 +1,32 @@
+{
+  "dataset_size": 90,
+  "train_size": 67,
+  "test_size": 23,
+  "accuracy": 0.913,
+  "precision": 0.8462,
+  "recall": 1.0,
+  "f1_score": 0.9167,
+  "confusion_matrix": {
+    "true_real_pred_real": 10,
+    "true_real_pred_fake": 2,
+    "true_fake_pred_real": 0,
+    "true_fake_pred_fake": 11,
+    "raw_matrix": [
+      [
+        10,
+        2
+      ],
+      [
+        0,
+        11
+      ]
+    ]
+  },
+  "model_type": "Logistic Regression",
+  "vectorizer_type": "TF-IDF (1-2 n-grams, sublinear_tf=True)",
+  "classes": {
+    "0": "REAL",
+    "1": "FAKE"
+  },
+  "note": "Metrics computed strictly on held-out test split (25%). Replace news_dataset.csv with larger Kaggle/WELFake datasets for scaled deployment."
+}
